@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Digirtal Library </title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 850px; margin: 2rem auto; padding: 0 1rem; background-color: #f8f9fa; color: #333; }
+        
+        h1 { color: #2c3e50; border-bottom: 2px solid #e9ecef; padding-bottom: 15px; margin-bottom: 25px; }
+
+        .nav-bar { display: flex; gap: 10px; margin-bottom: 30px; align-items: center; }
+        .btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s; border: none; cursor: pointer; }
+        .btn-green { background-color: #28a745; color: white; }
+        .btn-green:hover { background-color: #218838; }
+        .btn-gray { background-color: #6c757d; color: white; }
+        .btn-gray:hover { background-color: #5a6268; }
+        .btn-blue { color: #007bff; background: none; border: 1px solid #007bff; }
+        .btn-blue:hover { background-color: #007bff; color: white; }
+
+        .search-container { display: flex; gap: 10px; margin-bottom: 30px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        input[type="text"] { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #ced4da; border-radius: 4px; outline: none; }
+        input[type="text"]:focus { border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        .btn-search { background-color: #007bff; color: white; padding: 12px 25px; font-size: 16px; }
+        .btn-search:hover { background-color: #0069d9; }
+
+        /* RESULTS CARDS */
+        .card { display: flex; gap: 20px; align-items: flex-start; background: white; border: 1px solid #e9ecef; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        /* THUMBNAIL STYLE */
+        .book-cover { 
+            width: 100px; 
+            height: 140px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+            border: 1px solid #ddd;
+            background-color: #eee;
+            flex-shrink: 0;
+        }
+
+        .card-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; min-height: 140px; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 1.3rem; margin: 0; color: #007bff; text-decoration: none; font-weight: 600; }
+        .card-title:hover { text-decoration: underline; }
+        
+        .badge { background-color: #e8f5e9; color: #2e7d32; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; }
+        .meta { font-size: 0.95rem; color: #6c757d; }
+        
+        .no-results { text-align: center; color: #6c757d; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <h1>📚 My Digital Library</h1>
+    
+    <div class="nav-bar">
+        {% if user.is_authenticated %}
+            <a href="/catalog/upload/" class="btn btn-green">+ Upload Book</a>
+            <a href="/catalog/dashboard/" class="btn btn-gray">⚙️ Manage</a>
+            
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-blue" style="margin-left: 10px;">Logout</button>
+            </form>
+        {% else %}
+            <a href="/accounts/login/" class="btn btn-blue">🔒 Admin Login</a>
+        {% endif %}
+    </div>
+
+    <form class="search-container" method="get" action=".">
+        <input type="text" name="q" placeholder="Describe what you are looking for..." value="{{ query }}">
+        <button type="submit" class="btn btn-search">Search</button>
+    </form>
+
+    {% if query %}
+        <h3 style="color: #666; margin-bottom: 20px;">Results for: "{{ query }}"</h3>
+        
+        {% if results %}
+            {% for book in results %}
+                <div class="card">
+                    {% if book.thumbnail %}
+                        <img src="/media/{{ book.thumbnail }}" class="book-cover" alt="Cover">
+                    {% else %}
+                        <div class="book-cover" style="display:flex;align-items:center;justify-content:center;color:#999;font-size:30px;">📄</div>
+                    {% endif %}
+
+                    <div class="card-content">
+                        <div class="card-header">
+                            <a href="/media/{{ book.filename }}" target="_blank" class="card-title">
+                                {{ book.filename }}
+                            </a>
+                            <span class="badge">Match: {{ book.score }}%</span>
+                        </div>
+                        
+                        <div class="meta">
+                            Length: {{ book.total_pages }} pages 
+                            <span style="background-color: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; margin-left: 10px; font-weight: 600;">
+                                🏷️ {{ book.category }}
+                            </span>
+                        </div>
+                        
+                        </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <h3>🚫 No matching books found.</h3>
+                <p>Try searching for a simpler keyword or check the dashboard.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+</body>
+</html>

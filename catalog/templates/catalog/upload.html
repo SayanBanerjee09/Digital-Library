@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Book</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input[type="file"] { margin-bottom: 20px; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+        button:hover { background-color: #218838; }
+        .nav { margin-bottom: 20px; }
+        a { text-decoration: none; color: #007bff; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="/catalog/search/">← Back to Search</a>
+    </div>
+
+    <h1>📤 Upload New Book</h1>
+    <p>Upload a PDF. The AI will scan it and extract keywords automatically.</p>
+
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label><strong>Select PDF File:</strong></label><br><br>
+            <input type="file" name="pdf_file" accept=".pdf" required>
+            <button type="submit">Upload & Scan</button>
+        </form>
+    </div>
+
+</body>
+</html>
